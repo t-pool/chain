@@ -58,6 +58,10 @@ var (
 	errInvalidPoW        = errors.New("invalid proof-of-work")
 )
 
+func init() {
+	frontierBlockReward.SetString("155000000000000000000", 10) // Block reward in wei for successfully mining a ldbc block
+}
+
 // Author implements consensus.Engine, returning the header's coinbase as the
 // proof-of-work verified author of the block.
 func (ethash *Ethash) Author(header *types.Header) (common.Address, error) {
@@ -441,13 +445,6 @@ func calcDifficultyFrontier(time uint64, parent *types.Header) *big.Int {
 
 	periodCount := new(big.Int).Add(parent.Number, big1)
 	periodCount.Div(periodCount, expDiffPeriod)
-	if periodCount.Cmp(big1) > 0 {
-		// diff = diff + 2^(periodCount - 2)
-		expDiff := periodCount.Sub(periodCount, big2)
-		expDiff.Exp(big2, expDiff, nil)
-		diff.Add(diff, expDiff)
-		diff = math.BigMax(diff, params.MinimumDifficulty)
-	}
 	return diff
 }
 
